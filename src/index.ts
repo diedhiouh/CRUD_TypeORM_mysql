@@ -1,40 +1,25 @@
 import { AppDataSource } from "./data-source"
 import { User } from "./entity/User"
-import {Express} from "express"
 
 import express = require("express")
 import bodyParser = require("body-parser")
 
+// init express
 let app = express();
 
 
+// set Middleware bodyparser
 app.use(bodyParser.urlencoded({extended: true}));
 
 app.use(bodyParser.json());
 
-const userRepo = AppDataSource.getRepository(User);
+// init datasource
 AppDataSource.initialize();
 
-// let listuser ;
-// AppDataSource.initialize().then(async () => {
+// init user repository 
+const userRepo = AppDataSource.getRepository(User);
 
-//     console.log("Inserting a new user into the database...")
-//     const user = new User()
-//     user.firstName = "Timbere"
-//     user.lastName = "Saw"
-//     user.age = 25
-//     await AppDataSource.manager.save(user)
-//     console.log("Saved a new user with id: " + user.id)
-
-//     console.log("Loading users from the database...")
-//     const users = await AppDataSource.manager.find(User)
-//     console.log("Loaded users: ", users)
-//     listuser = users
-
-//     console.log("Here you can setup and run express / fastify / any other framework.")
-
-// }).catch(error => console.log(error))
-
+// Get all users
 app.get('/', async (req,res)=>{
 
     await userRepo.find().then((response) => {
@@ -45,7 +30,7 @@ app.get('/', async (req,res)=>{
     .catch((error) => res.json({error: error}));
 })
   
-
+// Get one user
 app.get('/:id', async (req,res) =>{
     // const id = {id: req.params.id}
     let payload  = parseInt(req.params.id);
@@ -61,6 +46,7 @@ app.get('/:id', async (req,res) =>{
     
 })
     
+// Add new user
 app.post("/", async (req, res)=>{
 
     const luser = req.body;
@@ -76,8 +62,10 @@ app.post("/", async (req, res)=>{
     .catch((error) => res.json({error: error}))
 
    
-})
+});
 
+
+//update user data
 app.put('/:id', async(req, res) => {
 
     let payload = req.body;
@@ -99,6 +87,7 @@ app.put('/:id', async(req, res) => {
    
 })
 
+// remove user
 app.delete('/:id', async (req, res) => {
 
     await userRepo.delete(parseInt(req.params.id))
@@ -115,8 +104,10 @@ app.delete('/:id', async (req, res) => {
     
 })
 
+// set PORT default app
 const PORT = process.env.PORT || '3000'
 
+// config lsitening port
 app.listen(PORT ,() => {
     console.log('listing port ' + PORT)
 });
